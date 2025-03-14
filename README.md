@@ -20,7 +20,7 @@ Un'applicazione web per misurare il livello di rumore ambientale in decibel util
 
 ## Demo
 
-Una demo dell'applicazione è disponibile all'indirizzo: [https://nomeutente.github.io/decibel-meter/](https://nomeutente.github.io/decibel-meter/)
+Una demo dell'applicazione è disponibile all'indirizzo: [https://umeglio.github.io/decibel.js/](https://umeglio.github.io/decibel.js/)
 
 ## Come iniziare
 
@@ -33,7 +33,7 @@ Una demo dell'applicazione è disponibile all'indirizzo: [https://nomeutente.git
 
 1. Clona il repository sul tuo computer:
    ```
-   git clone https://github.com/nomeutente/decibel-meter.git
+   git clone https://github.com/umeglio/decibel.js.git
    ```
 
 2. Naviga nella directory del progetto:
@@ -46,16 +46,15 @@ Una demo dell'applicazione è disponibile all'indirizzo: [https://nomeutente.git
 ### Configurazione per GitHub Pages
 
 1. Dopo aver clonato il repository, accedi al tuo account GitHub
-2. Crea un nuovo repository chiamato `decibel-meter`
+2. Crea un nuovo repository chiamato `decibel.js`
 3. Carica tutti i file nel nuovo repository:
    ```
-   git remote set-url origin https://github.com/nomeutente/decibel-meter.git
+   git remote set-url origin 
    git push -u origin main
    ```
 4. Vai su Settings > Pages
 5. Nella sezione "Source", seleziona il branch "main" e la cartella "/ (root)"
 6. Clicca su "Save"
-7. Attendi qualche minuto e il tuo sito sarà disponibile all'indirizzo `https://nomeutente.github.io/decibel-meter/`
 
 ## Struttura del Progetto
 
@@ -118,7 +117,7 @@ Questo progetto è rilasciato con licenza MIT. Vedi il file `LICENSE` per ulteri
 
 ## Contatti
 
-Per domande, suggerimenti o problemi, apri un issue sul [repository GitHub](https://github.com/nomeutente/decibel-meter/issues).
+Per domande, suggerimenti o problemi, apri un issue sul [repository GitHub](https://github.com/umeglio/decibel.js/issues).
 
 ---
 
