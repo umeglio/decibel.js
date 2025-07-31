@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accordatore Professionale per Chitarra</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+            --danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            
+            --bg-dark: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            
+            --wood-color: #8B4513;
+            --wood-gradient: linear-gradient(135deg, #D2691E 0%, #8B4513 50%, #654321 100%);
+            --string-color: #C0C0C0;
+            --fret-color: #FFD700;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--primary-gradient);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50px, -50px) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .left-panel, .right-panel {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .guitar-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Guitar Visual */
+        .guitar-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px 0;
+        }
+
+        .guitar-body {
+            width: 100%;
+            height: 400px;
+            background: var(--wood-gradient);
+            border-radius: 20px 20px 60px 60px;
+            position: relative;
+            box-shadow: 
+                inset 0 0 50px rgba(0,0,0,0.3),
+                0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .guitar-neck {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 500px;
+            background: linear-gradient(90deg, #654321 0%, #8B4513 50%, #654321 100%);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .guitar-headstock {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 60px;
+            background: var(--wood-gradient);
+            border-radius: 15px 15px 5px 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .tuning-pegs {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .tuning-peg {
+            width: 20px;
+            height: 20px;
+            background: var(--fret-color);
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .tuning-peg:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .tuning-peg.active {
+            background: var(--success-gradient);
+            animation: pulse 1s infinite;
+        }
+
+        .tuning-peg.sharp {
+            animation: rotate-right 0.5s ease-in-out;
+        }
+
+        .tuning-peg.flat {
+            animation: rotate-left 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes rotate-right {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes rotate-left {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-15deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .frets {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 350px;
+        }
+
+        .fret {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: var(--fret-color);
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .guitar-strings {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            padding: 0 10px;
+        }
+
+        .guitar-string {
+            width: 4px;
+            height: 100%;
+            background: var(--string-color);
+            border-radius: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(192, 192, 192, 0.3);
+        }
+
+        .guitar-string.active {
+            background: var(--success-gradient);
+            animation: string-vibrate 0.5s infinite;
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.6);
+        }
+
+        .guitar-string.sharp {
+            background: var(--danger-gradient);
+            animation: string-tension 1s ease-in-out;
+        }
+
+        .guitar-string.flat {
+            background: var(--warning-gradient);
+            animation: string-loose 1s ease-in-out;
+        }
+
+        .guitar-string.in-tune {
+            background: var(--success-gradient);
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.8);
+        }
+
+        @keyframes string-vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-1px); }
+            75% { transform: translateX(1px); }
+        }
+
+        @keyframes string-tension {
+            0%, 100% { transform: scaleX(1); }
+            50% { transform: scaleX(0.8); }
+        }
+
+        @keyframes string-loose {
+            0%, 100% { transform: scaleX(1); }
+            50% { transform: scaleX(1.2); }
+        }
+
+        .string-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .guitar-string:hover .string-label,
+        .guitar-string.active .string-label {
+            opacity: 1;
+            bottom: -25px;
+        }
+
+        .string-indicator {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .guitar-string.active .string-indicator {
+            background: var(--success-gradient);
+            transform: translateX(-50%) scale(1.5);
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.6);
+        }
+
+        /* Frequency Display */
+        .frequency-display {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .current-frequency {
+            font-size: 4em;
+            font-weight: 800;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .note-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .note-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .note-card h4 {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .note-card .value {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        /* Modern Controls */
+        .control-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .control-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        /* App-style buttons */
+        .app-button {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .app-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .app-button:hover::before {
+            left: 100%;
+        }
+
+        .app-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .app-button:active {
+            transform: translateY(0);
+        }
+
+        .app-button:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .app-button.danger {
+            background: var(--danger-gradient);
+        }
+
+        .app-button.success {
+            background: var(--success-gradient);
+        }
+
+        /* Modern Sliders */
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .slider-value {
+            font-weight: 700;
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+
+        .modern-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+        }
+
+        .modern-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .modern-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modern-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Preset Wheel */
+        .preset-wheel {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 8px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preset-wheel:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .preset-wheel-inner {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+
+        .preset-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .preset-option {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            padding: 12px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .preset-option:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            transform: translateX(5px);
+        }
+
+        .preset-option.active {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Reference Tones */
+        .tone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .tone-button {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            padding: 15px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.85em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tone-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--success-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tone-button.playing::before {
+            opacity: 1;
+        }
+
+        .tone-button.playing {
+            color: white;
+            animation: tone-pulse 1s infinite;
+        }
+
+        .tone-button .tone-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes tone-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Visual Meter */
+        .visual-meter {
+            width: 100%;
+            height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .meter-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                rgba(255, 154, 158, 0.3) 0%,
+                rgba(253, 187, 45, 0.3) 35%,
+                rgba(79, 172, 254, 0.3) 50%,
+                rgba(253, 187, 45, 0.3) 65%,
+                rgba(255, 154, 158, 0.3) 100%);
+        }
+
+        .meter-needle {
+            position: absolute;
+            top: 10px;
+            bottom: 10px;
+            width: 4px;
+            background: white;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(255,255,255,0.6);
+            z-index: 2;
+        }
+
+        .meter-scale {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 0.8em;
+            color: var(--text-muted);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--bg-secondary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.active {
+            background: var(--success-gradient);
+            animation: status-pulse 2s infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(79, 172, 254, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(79, 172, 254, 0.6); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .left-panel, .right-panel {
+                order: 2;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .guitar-container {
+                transform: scale(0.8);
+            }
+            
+            .current-frequency {
+                font-size: 3em;
+            }
+            
+            .left-panel, .right-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .tone-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .note-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+    Autore: Umberto Meglio
+    Supporto alla creazione: Claude di Anthropic
+    -->
+    
+    <div class="app-container">
+        <header class="header">
+            <h1>🎸 Accordatore Professionale</h1>
+            <p>Interfaccia grafica avanzata con rappresentazione visuale della chitarra</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Left Panel - Controls -->
+            <aside class="left-panel">
+                <div class="control-section">
+                    <h3 class="control-title">🎵 Controlli Audio</h3>
+                    <button id="startBtn" class="app-button">
+                        <span>🎤</span>
+                        <span>Avvia Rilevamento</span>
+                    </button>
+                    <button id="stopBtn" class="app-button danger" disabled>
+                        <span>⏹️</span>
+                        <span>Ferma</span>
+                    </button>
+                    <button id="calibrateBtn" class="app-button success">
+                        <span>🔧</span>
+                        <span>Calibra A440</span>
+                    </button>
+                </div>
+
+                <div class="control-section">
+                    <h3 class="control-title">🎛️ Parametri</h3>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Sensibilità Microfono</span>
+                            <span class="slider-value" id="sensitivityValue">1.0x</span>
+                        </div>
+                        <input type="range" id="sensitivitySlider" class="modern-slider" min="0.1" max="3" step="0.1" value="1">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Smoothing Temporale</span>
+                            <span class="slider-value" id="smoothingValue">0.3</span>
+                        </div>
+                        <input type="range" id="smoothingSlider" class="modern-slider" min="0.1" max="0.9" step="0.1" value="0.3">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Soglia Rilevamento</span>
+                            <span class="slider-value" id="thresholdValue">0.10</span>
+                        </div>
+                        <input type="range" id="thresholdSlider" class="modern-slider" min="0.01" max="0.5" step="0.01" value="0.1">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Calibrazione A4 (Hz)</span>
+                            <span class="slider-value" id="a4Value">440.0</span>
+                        </div>
+                        <input type="range" id="a4Slider" class="modern-slider" min="430" max="450" step="0.1" value="440">
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3 class="control-title">🎸 Accordature</h3>
+                    <div class="preset-wheel" id="presetWheel">
+                        <div class="preset-wheel-inner">
+                            <div class="preset-name" id="presetName">Standard</div>
+                        </div>
+                    </div>
+                    <div class="preset-options" id="presetOptions">
+                        <!-- Generated dynamically -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Panel - Guitar Visualization -->
+            <section class="guitar-section">
+                <div class="frequency-display">
+                    <div class="current-frequency" id="currentFreq">---.-- Hz</div>
+                    <div class="note-info">
+                        <div class="note-card">
+                            <h4>Nota Rilevata</h4>
+                            <div class="value" id="targetNote">Pronto</div>
+                        </div>
+                        <div class="note-card">
+                            <h4>Deviazione</h4>
+                            <div class="value" id="centDeviation">0¢</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-meter">
+                    <div class="meter-background"></div>
+                    <div class="meter-needle" id="meterNeedle"></div>
+                    <div class="meter-scale">
+                        <span>-50¢</span>
+                        <span>-25¢</span>
+                        <span>0¢</span>
+                        <span>+25¢</span>
+                        <span>+50¢</span>
+                    </div>
+                </div>
+
+                <div class="guitar-container">
+                    <!-- Tuning Pegs -->
+                    <div class="tuning-pegs" id="tuningPegs">
+                        <div class="tuning-peg" data-string="0"></div>
+                        <div class="tuning-peg" data-string="1"></div>
+                        <div class="tuning-peg" data-string="2"></div>
+                        <div class="tuning-peg" data-string="3"></div>
+                        <div class="tuning-peg" data-string="4"></div>
+                        <div class="tuning-peg" data-string="5"></div>
+                    </div>
+
+                    <!-- Headstock -->
+                    <div class="guitar-headstock"></div>
+
+                    <!-- Neck with Frets -->
+                    <div class="guitar-neck">
+                        <div class="frets">
+                            <div class="fret" style="top: 20px;"></div>
+                            <div class="fret" style="top: 40px;"></div>
+                            <div class="fret" style="top: 60px;"></div>
+                            <div class="fret" style="top: 80px;"></div>
+                            <div class="fret" style="top: 100px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Strings -->
+                    <div class="guitar-strings" id="guitarStrings">
+                        <div class="guitar-string" data-string="0">
+                            <div class="string-indicator"></div>
+                            <div class="string-label" id="stringLabel0">Mi (E2)</div>
+                        </div>
+                        <div class="guitar-string" data-string="1">
+                            <div class="string-indicator"></div>
+                            <div class="string-label" id="stringLabel1">La (A2)</div>
+                        </div>
+                        <div class="guitar-string" data-string="2">
+                            <div class="string-indicator"></div>
+                            <div class="string-label" id="stringLabel2">Re (D3)</div>
+                        </div>
+                        <div class="guitar-string" data-string="3">
+                            <div class="string-indicator"></div>
+                            <div class="string-label" id="stringLabel3">Sol (G3)</div>
+                        </div>
+                        <div class="guitar-string" data-string="4">
+                            <div class="string-indicator"></div>
+                            <div class="string-label" id="stringLabel4">Si (B3)</div>
+                        </div>
+                        <div class="guitar-string" data-string="5">
+                            <div class="string-indicator"></div>
+                            <div class="string-label" id="stringLabel5">Mi (E4)</div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="guitar-body"></div>
+                </div>
+            </section>
+
+            <!-- Right Panel - Reference Tones -->
+            <aside class="right-panel">
+                <div class="control-section">
+                    <h3 class="control-title">🔊 Toni di Riferimento</h3>
+                    <div class="tone-grid" id="toneGrid">
+                        <!-- Generated dynamically -->
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3 class="control-title">📊 Analisi Spettrale</h3>
+                    <canvas id="spectrumCanvas" width="250" height="150" style="width: 100%; height: 150px; border-radius: 10px; background: rgba(255,255,255,0.05);"></canvas>
+                </div>
+
+                <div class="control-section">
+                    <h3 class="control-title">〰️ Forma d'Onda</h3>
+                    <canvas id="waveformCanvas" width="250" height="100" style="width: 100%; height: 100px; border-radius: 10px; background: rgba(255,255,255,0.05);"></canvas>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="status-bar">
+            <div class="status-item">
+                <div class="status-indicator" id="microphoneStatus"></div>
+                <span>Microfono</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="audioStatus"></div>
+                <span>Audio Engine</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator" id="detectionStatus"></div>
+                <span>Rilevamento Attivo</span>
+            </div>
+            <div class="status-item">
+                <span id="performanceInfo">FPS: --</span>
+            </div>
+            <div class="status-item">
+                <span style="font-size: 0.8em; opacity: 0.7;">
+                    © Umberto Meglio | Claude di Anthropic
+                </span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        /**
+         * Accordatore Professionale con Interfaccia Grafica Chitarra
+         * Implementazione completa con visualizzazione 3D e controlli app-style
+         * 
+         * Autore: Umberto Meglio
+         * Supporto alla creazione: Claude di Anthropic
+         */
+
+        class VisualGuitarTuner {
+            constructor() {
+                this.initializeProperties();
+                this.initializeTunings();
+                this.initializeElements();
+                this.setupEventListeners();
+                this.setupUI();
+                this.setupCanvas();
+                
+                // Performance monitoring
+                this.frameCount = 0;
+                this.lastFPSUpdate = Date.now();
+                this.fps = 0;
+            }
+
+            initializeProperties() {
+                // Audio context e analizzatori
+                this.audioContext = null;
+                this.analyser = null;
+                this.analyserFFT = null;
+                this.microphone = null;
+                this.gainNode = null;
+
+                // Buffer e array per analisi
+                this.bufferLength = 0;
+                this.dataArray = null;
+                this.frequencyArray = null;
+                this.timeDataArray = null;
+
+                // Stato del tuner
+                this.isListening = false;
+                this.animationId = null;
+                this.currentTuning = 'standard';
+                this.sensitivity = 1.0;
+                this.smoothing = 0.3;
+                this.threshold = 0.1;
+                this.a4Frequency = 440.0;
+
+                // Cache per ottimizzazioni
+                this.frequencyCache = new Map();
+                this.lastDetectedFrequency = 0;
+                this.lastDetectionTime = 0;
+                this.detectionHistory = [];
+                this.currentActiveString = -1;
+
+                // Generatori di tono di riferimento
+                this.referenceOscillators = new Map();
+                this.referenceGainNodes = new Map();
+            }
+
+            initializeTunings() {
+                this.tunings = {
+                    standard: {
+                        name: 'Standard',
+                        fullName: 'Standard (EADGBE)',
+                        strings: [
+                            { name: 'Mi', note: 'E2', frequency: 82.41, string: 6 },
+                            { name: 'La', note: 'A2', frequency: 110.00, string: 5 },
+                            { name: 'Re', note: 'D3', frequency: 146.83, string: 4 },
+                            { name: 'Sol', note: 'G3', frequency: 196.00, string: 3 },
+                            { name: 'Si', note: 'B3', frequency: 246.94, string: 2 },
+                            { name: 'Mi', note: 'E4', frequency: 329.63, string: 1 }
+                        ]
+                    },
+                    dropD: {
+                        name: 'Drop D',
+                        fullName: 'Drop D (DADGBE)',
+                        strings: [
+                            { name: 'Re', note: 'D2', frequency: 73.42, string: 6 },
+                            { name: 'La', note: 'A2', frequency: 110.00, string: 5 },
+                            { name: 'Re', note: 'D3', frequency: 146.83, string: 4 },
+                            { name: 'Sol', note: 'G3', frequency: 196.00, string: 3 },
+                            { name: 'Si', note: 'B3', frequency: 246.94, string: 2 },
+                            { name: 'Mi', note: 'E4', frequency: 329.63, string: 1 }
+                        ]
+                    },
+                    openG: {
+                        name: 'Open G',
+                        fullName: 'Open G (DGDGBD)',
+                        strings: [
+                            { name: 'Re', note: 'D2', frequency: 73.42, string: 6 },
+                            { name: 'Sol', note: 'G2', frequency: 98.00, string: 5 },
+                            { name: 'Re', note: 'D3', frequency: 146.83, string: 4 },
+                            { name: 'Sol', note: 'G3', frequency: 196.00, string: 3 },
+                            { name: 'Si', note: 'B3', frequency: 246.94, string: 2 },
+                            { name: 'Re', note: 'D4', frequency: 293.66, string: 1 }
+                        ]
+                    },
+                    openE: {
+                        name: 'Open E',
+                        fullName: 'Open E (EBEG#BE)',
+                        strings: [
+                            { name: 'Mi', note: 'E2', frequency: 82.41, string: 6 },
+                            { name: 'Si', note: 'B2', frequency: 123.47, string: 5 },
+                            { name: 'Mi', note: 'E3', frequency: 164.81, string: 4 },
+                            { name: 'Sol#', note: 'G#3', frequency: 207.65, string: 3 },
+                            { name: 'Si', note: 'B3', frequency: 246.94, string: 2 },
+                            { name: 'Mi', note: 'E4', frequency: 329.63, string: 1 }
+                        ]
+                    },
+                    dadgad: {
+                        name: 'DADGAD',
+                        fullName: 'DADGAD',
+                        strings: [
+                            { name: 'Re', note: 'D2', frequency: 73.42, string: 6 },
+                            { name: 'La', note: 'A2', frequency: 110.00, string: 5 },
+                            { name: 'Re', note: 'D3', frequency: 146.83, string: 4 },
+                            { name: 'Sol', note: 'G3', frequency: 196.00, string: 3 },
+                            { name: 'La', note: 'A3', frequency: 220.00, string: 2 },
+                            { name: 'Re', note: 'D4', frequency: 293.66, string: 1 }
+                        ]
+                    }
+                };
+            }
+
+            initializeElements() {
+                // Bottoni controllo
+                this.startBtn = document.getElementById('startBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.calibrateBtn = document.getElementById('calibrateBtn');
+
+                // Display
+                this.currentFreq = document.getElementById('currentFreq');
+                this.targetNote = document.getElementById('targetNote');
+                this.centDeviation = document.getElementById('centDeviation');
+                this.meterNeedle = document.getElementById('meterNeedle');
+
+                // Guitar visual elements
+                this.guitarStrings = document.querySelectorAll('.guitar-string');
+                this.tuningPegs = document.querySelectorAll('.tuning-peg');
+                this.stringLabels = [];
+                for (let i = 0; i < 6; i++) {
+                    this.stringLabels.push(document.getElementById(`stringLabel${i}`));
+                }
+
+                // Canvas
+                this.spectrumCanvas = document.getElementById('spectrumCanvas');
+                this.waveformCanvas = document.getElementById('waveformCanvas');
+                this.spectrumCtx = this.spectrumCanvas.getContext('2d');
+                this.waveformCtx = this.waveformCanvas.getContext('2d');
+
+                // Controlli
+                this.presetWheel = document.getElementById('presetWheel');
+                this.presetName = document.getElementById('presetName');
+                this.presetOptions = document.getElementById('presetOptions');
+                this.toneGrid = document.getElementById('toneGrid');
+
+                // Sliders
+                this.sensitivitySlider = document.getElementById('sensitivitySlider');
+                this.smoothingSlider = document.getElementById('smoothingSlider');
+                this.thresholdSlider = document.getElementById('thresholdSlider');
+                this.a4Slider = document.getElementById('a4Slider');
+
+                // Status indicators
+                this.microphoneStatus = document.getElementById('microphoneStatus');
+                this.audioStatus = document.getElementById('audioStatus');
+                this.detectionStatus = document.getElementById('detectionStatus');
+                this.performanceInfo = document.getElementById('performanceInfo');
+            }
+
+            setupEventListeners() {
+                // Controlli principali
+                this.startBtn.addEventListener('click', () => this.startTuning());
+                this.stopBtn.addEventListener('click', () => this.stopTuning());
+                this.calibrateBtn.addEventListener('click', () => this.calibrateA440());
+
+                // Sliders con aggiornamento in tempo reale
+                this.sensitivitySlider.addEventListener('input', (e) => {
+                    this.sensitivity = parseFloat(e.target.value);
+                    document.getElementById('sensitivityValue').textContent = this.sensitivity.toFixed(1) + 'x';
+                    if (this.gainNode) {
+                        this.gainNode.gain.setValueAtTime(this.sensitivity, this.audioContext.currentTime);
+                    }
+                });
+
+                this.smoothingSlider.addEventListener('input', (e) => {
+                    this.smoothing = parseFloat(e.target.value);
+                    document.getElementById('smoothingValue').textContent = this.smoothing.toFixed(1);
+                    if (this.analyser) {
+                        this.analyser.smoothingTimeConstant = this.smoothing;
+                    }
+                });
+
+                this.thresholdSlider.addEventListener('input', (e) => {
+                    this.threshold = parseFloat(e.target.value);
+                    document.getElementById('thresholdValue').textContent = this.threshold.toFixed(2);
+                });
+
+                this.a4Slider.addEventListener('input', (e) => {
+                    this.a4Frequency = parseFloat(e.target.value);
+                    document.getElementById('a4Value').textContent = this.a4Frequency.toFixed(1);
+                    this.updateTuningFrequencies();
+                });
+
+                // Guitar string interactions
+                this.guitarStrings.forEach((string, index) => {
+                    string.addEventListener('click', () => {
+                        this.playReferenceNote(this.tunings[this.currentTuning].strings[index].frequency);
+                        this.highlightString(index, 2000);
+                    });
+                });
+
+                // Tuning peg interactions
+                this.tuningPegs.forEach((peg, index) => {
+                    peg.addEventListener('click', () => {
+                        this.playReferenceNote(this.tunings[this.currentTuning].strings[index].frequency);
+                        this.highlightString(index, 2000);
+                    });
+                });
+
+                // Preset wheel interaction
+                this.presetWheel.addEventListener('click', () => {
+                    this.togglePresetOptions();
+                });
+
+                // Gestione ridimensionamento finestra
+                window.addEventListener('resize', () => this.handleResize());
+            }
+
+            setupUI() {
+                this.createPresetOptions();
+                this.createToneGrid();
+                this.updateStringLabels();
+                this.updateTuningFrequencies();
+            }
+
+            setupCanvas() {
+                this.handleResize();
+            }
+
+            handleResize() {
+                // Ridimensiona i canvas mantenendo la risoluzione
+                const dpr = window.devicePixelRatio || 1;
+                
+                // Spectrum canvas
+                const spectrumRect = this.spectrumCanvas.getBoundingClientRect();
+                this.spectrumCanvas.width = spectrumRect.width * dpr;
+                this.spectrumCanvas.height = spectrumRect.height * dpr;
+                this.spectrumCtx.scale(dpr, dpr);
+
+                // Waveform canvas
+                const waveformRect = this.waveformCanvas.getBoundingClientRect();
+                this.waveformCanvas.width = waveformRect.width * dpr;
+                this.waveformCanvas.height = waveformRect.height * dpr;
+                this.waveformCtx.scale(dpr, dpr);
+            }
+
+            createPresetOptions() {
+                this.presetOptions.innerHTML = '';
+                Object.keys(this.tunings).forEach((key, index) => {
+                    const preset = this.tunings[key];
+                    const option = document.createElement('div');
+                    option.className = `preset-option ${key === this.currentTuning ? 'active' : ''}`;
+                    option.textContent = preset.fullName;
+                    option.addEventListener('click', () => this.setTuning(key));
+                    this.presetOptions.appendChild(option);
+                });
+            }
+
+            createToneGrid() {
+                this.toneGrid.innerHTML = '';
+                const currentStrings = this.tunings[this.currentTuning].strings;
+                
+                currentStrings.forEach((string, index) => {
+                    const button = document.createElement('div');
+                    button.className = 'tone-button';
+                    button.innerHTML = `
+                        <div class="tone-content">
+                            <div style="font-weight: 700;">${string.name}</div>
+                            <div style="font-size: 0.8em; opacity: 0.8;">${string.note}</div>
+                            <div style="font-size: 0.7em; opacity: 0.6;">${string.frequency.toFixed(1)}Hz</div>
+                        </div>
+                    `;
+                    button.addEventListener('click', () => this.toggleReferenceNote(string.frequency, button, index));
+                    this.toneGrid.appendChild(button);
+                });
+            }
+
+            updateStringLabels() {
+                const currentStrings = this.tunings[this.currentTuning].strings;
+                currentStrings.forEach((string, index) => {
+                    if (this.stringLabels[index]) {
+                        this.stringLabels[index].textContent = `${string.name} (${string.note})`;
+                    }
+                });
+            }
+
+            setTuning(tuningKey) {
+                if (tuningKey === this.currentTuning) return;
+                
+                this.currentTuning = tuningKey;
+                this.presetName.textContent = this.tunings[tuningKey].name;
+                
+                this.createPresetOptions();
+                this.createToneGrid();
+                this.updateStringLabels();
+                this.updateTuningFrequencies();
+                
+                // Animazione di cambio preset
+                this.presetWheel.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.presetWheel.style.transform = 'scale(1)';
+                }, 200);
+            }
+
+            togglePresetOptions() {
+                const options = this.presetOptions;
+                if (options.style.display === 'none' || !options.style.display) {
+                    options.style.display = 'flex';
+                    options.style.animation = 'slideIn 0.3s ease-out';
+                } else {
+                    options.style.display = 'none';
+                }
+            }
+
+            updateTuningFrequencies() {
+                // Aggiorna le frequenze basate sulla calibrazione A4
+                const a4Ratio = this.a4Frequency / 440.0;
+                
+                Object.keys(this.tunings).forEach(tuningKey => {
+                    this.tunings[tuningKey].strings.forEach(string => {
+                        const originalFreq = string.frequency / (this.a4Frequency / 440.0 || 1);
+                        string.frequency = originalFreq * a4Ratio;
+                    });
+                });
+                
+                this.createToneGrid();
+                this.updateStringLabels();
+            }
+
+            highlightString(stringIndex, duration = 1000) {
+                const string = this.guitarStrings[stringIndex];
+                const peg = this.tuningPegs[stringIndex];
+                
+                string.classList.add('active');
+                peg.classList.add('active');
+                
+                setTimeout(() => {
+                    string.classList.remove('active');
+                    peg.classList.remove('active');
+                }, duration);
+            }
+
+            async startTuning() {
+                try {
+                    // Mostra loading
+                    this.startBtn.innerHTML = '<div class="loading"></div><span>Inizializzazione...</span>';
+                    
+                    // Richiedi accesso al microfono con parametri ottimali
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            sampleRate: 48000,
+                            channelCount: 1,
+                            echoCancellation: false,
+                            autoGainControl: false,
+                            noiseSuppression: false,
+                            latency: 0
+                        }
+                    });
+
+                    // Inizializza il contesto audio
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                        sampleRate: 48000,
+                        latencyHint: 'interactive'
+                    });
+
+                    // Crea nodi audio
+                    this.microphone = this.audioContext.createMediaStreamSource(stream);
+                    this.gainNode = this.audioContext.createGain();
+                    this.gainNode.gain.setValueAtTime(this.sensitivity, this.audioContext.currentTime);
+
+                    // Configura analizzatori
+                    this.analyser = this.audioContext.createAnalyser();
+                    this.analyser.fftSize = 8192;
+                    this.analyser.smoothingTimeConstant = this.smoothing;
+                    this.analyser.minDecibels = -100;
+                    this.analyser.maxDecibels = -10;
+
+                    this.analyserFFT = this.audioContext.createAnalyser();
+                    this.analyserFFT.fftSize = 16384;
+                    this.analyserFFT.smoothingTimeConstant = 0.1;
+
+                    // Connetti i nodi
+                    this.microphone.connect(this.gainNode);
+                    this.gainNode.connect(this.analyser);
+                    this.gainNode.connect(this.analyserFFT);
+
+                    // Inizializza buffer
+                    this.bufferLength = this.analyser.frequencyBinCount;
+                    this.dataArray = new Uint8Array(this.bufferLength);
+                    this.frequencyArray = new Uint8Array(this.analyserFFT.frequencyBinCount);
+                    this.timeDataArray = new Float32Array(this.analyser.fftSize);
+
+                    // Aggiorna UI
+                    this.isListening = true;
+                    this.startBtn.innerHTML = '<span>🎤</span><span>Avvia Rilevamento</span>';
+                    this.startBtn.disabled = true;
+                    this.stopBtn.disabled = false;
+                    
+                    this.microphoneStatus.classList.add('active');
+                    this.audioStatus.classList.add('active');
+
+                    // Avvia analisi
+                    this.analyze();
+
+                } catch (error) {
+                    console.error('Errore nell\'inizializzazione audio:', error);
+                    this.showError('Impossibile accedere al microfono. Verifica i permessi del browser.');
+                    this.startBtn.innerHTML = '<span>🎤</span><span>Avvia Rilevamento</span>';
+                    this.startBtn.disabled = false;
+                }
+            }
+
+            stopTuning() {
+                this.isListening = false;
+
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+
+                // Ferma tutti i toni di riferimento
+                this.referenceOscillators.forEach(osc => {
+                    try {
+                        osc.stop();
+                    } catch (e) {}
+                });
+                this.referenceOscillators.clear();
+                this.referenceGainNodes.clear();
+
+                // Disconnetti nodi audio
+                if (this.microphone) {
+                    this.microphone.disconnect();
+                    this.microphone = null;
+                }
+
+                if (this.gainNode) {
+                    this.gainNode.disconnect();
+                    this.gainNode = null;
+                }
+
+                if (this.analyser) {
+                    this.analyser.disconnect();
+                    this.analyser = null;
+                }
+
+                if (this.analyserFFT) {
+                    this.analyserFFT.disconnect();
+                    this.analyserFFT = null;
+                }
+
+                if (this.audioContext) {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+
+                // Reset UI
+                this.startBtn.disabled = false;
+                this.stopBtn.disabled = true;
+                this.currentFreq.textContent = '---.-- Hz';
+                this.targetNote.textContent = 'Pronto';
+                this.centDeviation.textContent = '0¢';
+                this.meterNeedle.style.left = '50%';
+
+                // Reset status indicators
+                this.microphoneStatus.classList.remove('active');
+                this.audioStatus.classList.remove('active');
+                this.detectionStatus.classList.remove('active');
+
+                // Reset guitar visual
+                this.resetGuitarVisual();
+                
+                // Reset reference tone buttons
+                document.querySelectorAll('.tone-button').forEach(btn => {
+                    btn.classList.remove('playing');
+                });
+
+                // Clear canvas
+                this.clearCanvas();
+                this.currentActiveString = -1;
+            }
+
+            resetGuitarVisual() {
+                this.guitarStrings.forEach(string => {
+                    string.classList.remove('active', 'sharp', 'flat', 'in-tune');
+                });
+                
+                this.tuningPegs.forEach(peg => {
+                    peg.classList.remove('active', 'sharp', 'flat');
+                });
+            }
+
+            analyze() {
+                if (!this.isListening) return;
+
+                // Ottieni dati audio
+                this.analyser.getByteFrequencyData(this.dataArray);
+                this.analyserFFT.getByteFrequencyData(this.frequencyArray);
+                this.analyser.getFloatTimeDomainData(this.timeDataArray);
+
+                // Analizza frequenza
+                const frequency = this.detectFrequency();
+                
+                if (frequency > 0) {
+                    this.updateDisplay(frequency);
+                    this.detectionStatus.classList.add('active');
+                } else {
+                    this.detectionStatus.classList.remove('active');
+                    // Se non rileva nulla, reset della visualizzazione chitarra
+                    if (this.currentActiveString >= 0) {
+                        this.resetGuitarVisual();
+                        this.currentActiveString = -1;
+                    }
+                }
+
+                // Disegna visualizzazioni
+                this.drawSpectrum();
+                this.drawWaveform();
+
+                // Aggiorna performance info
+                this.updatePerformanceInfo();
+
+                this.animationId = requestAnimationFrame(() => this.analyze());
+            }
+
+            detectFrequency() {
+                // Combina FFT e autocorrelazione per maggiore precisione
+                const fftFreq = this.detectFrequencyFFT();
+                const corrFreq = this.detectFrequencyAutocorrelation();
+
+                // Se entrambi i metodi concordano, usa la media pesata
+                if (fftFreq > 0 && corrFreq > 0) {
+                    const diff = Math.abs(fftFreq - corrFreq) / Math.max(fftFreq, corrFreq);
+                    if (diff < 0.1) { // 10% di tolleranza
+                        return (fftFreq * 0.3 + corrFreq * 0.7); // Priorità all'autocorrelazione
+                    }
+                }
+
+                // Altrimenti usa il metodo più affidabile per la situazione
+                return corrFreq > 0 ? corrFreq : fftFreq;
+            }
+
+            detectFrequencyFFT() {
+                const nyquist = this.audioContext.sampleRate / 2;
+                const binWidth = nyquist / this.frequencyArray.length;
+                
+                let maxBin = -1;
+                let maxValue = 0;
+                
+                // Cerca nella gamma delle frequenze della chitarra (60-500 Hz)
+                const minBin = Math.floor(60 / binWidth);
+                const maxBinLimit = Math.floor(500 / binWidth);
+                
+                for (let i = minBin; i < Math.min(maxBinLimit, this.frequencyArray.length); i++) {
+                    if (this.frequencyArray[i] > maxValue && this.frequencyArray[i] > this.threshold * 255) {
+                        maxValue = this.frequencyArray[i];
+                        maxBin = i;
+                    }
+                }
+
+                if (maxBin > 0) {
+                    // Interpolazione parabolica per maggiore precisione
+                    const y1 = maxBin > 0 ? this.frequencyArray[maxBin - 1] : 0;
+                    const y2 = this.frequencyArray[maxBin];
+                    const y3 = maxBin < this.frequencyArray.length - 1 ? this.frequencyArray[maxBin + 1] : 0;
+                    
+                    const a = (y1 - 2 * y2 + y3) / 2;
+                    const b = (y3 - y1) / 2;
+                    
+                    if (a !== 0) {
+                        const correction = -b / (2 * a);
+                        return (maxBin + correction) * binWidth;
+                    }
+                    
+                    return maxBin * binWidth;
+                }
+
+                return 0;
+            }
+
+            detectFrequencyAutocorrelation() {
+                const sampleRate = this.audioContext.sampleRate;
+                const bufferSize = this.timeDataArray.length;
+                
+                // Calcola RMS per verificare se c'è abbastanza segnale
+                let rms = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    rms += this.timeDataArray[i] * this.timeDataArray[i];
+                }
+                rms = Math.sqrt(rms / bufferSize);
+                
+                if (rms < this.threshold) return 0;
+
+                // Autocorrelazione con algoritmo YIN migliorato
+                const yinBuffer = new Float32Array(bufferSize / 2);
+                yinBuffer[0] = 1;
+                
+                let runningSum = 0;
+                for (let tau = 1; tau < yinBuffer.length; tau++) {
+                    yinBuffer[tau] = 0;
+                    for (let i = 0; i < yinBuffer.length; i++) {
+                        const delta = this.timeDataArray[i] - this.timeDataArray[i + tau];
+                        yinBuffer[tau] += delta * delta;
+                    }
+                    
+                    runningSum += yinBuffer[tau];
+                    yinBuffer[tau] *= tau / runningSum;
+                }
+
+                // Trova il primo minimo sotto la soglia
+                const threshold = 0.15;
+                let tau = 2;
+                while (tau < yinBuffer.length) {
+                    if (yinBuffer[tau] < threshold) {
+                        while (tau + 1 < yinBuffer.length && yinBuffer[tau + 1] < yinBuffer[tau]) {
+                            tau++;
+                        }
+                        break;
+                    }
+                    tau++;
+                }
+
+                if (tau === yinBuffer.length) return 0;
+
+                // Interpolazione parabolica
+                const betterTau = this.parabolicInterpolation(yinBuffer, tau);
+                const frequency = sampleRate / betterTau;
+                
+                // Verifica che sia nella gamma delle frequenze della chitarra
+                return (frequency >= 60 && frequency <= 500) ? frequency : 0;
+            }
+
+            parabolicInterpolation(array, x) {
+                if (x < 1 || x >= array.length - 1) return x;
+                
+                const s0 = array[x - 1];
+                const s1 = array[x];
+                const s2 = array[x + 1];
+                
+                const a = (s0 - 2 * s1 + s2) / 2;
+                const b = (s2 - s0) / 2;
+                
+                if (a !== 0) {
+                    return x - b / (2 * a);
+                }
+                
+                return x;
+            }
+
+            updateDisplay(frequency) {
+                this.currentFreq.textContent = frequency.toFixed(2) + ' Hz';
+                
+                const closestString = this.findClosestString(frequency);
+                
+                if (closestString) {
+                    this.targetNote.textContent = `${closestString.name} (${closestString.note})`;
+                    
+                    // Calcola deviazione in cent
+                    const cents = 1200 * Math.log2(frequency / closestString.frequency);
+                    this.centDeviation.textContent = `${cents > 0 ? '+' : ''}${cents.toFixed(1)}¢`;
+                    
+                    // Aggiorna ago del meter
+                    const needlePosition = Math.max(-50, Math.min(50, cents));
+                    const needlePercent = 50 + (needlePosition / 50) * 40;
+                    this.meterNeedle.style.left = needlePercent + '%';
+                    
+                    // Aggiorna visualizzazione chitarra
+                    this.updateGuitarVisual(closestString, Math.abs(cents), cents);
+                    
+                    // Colore dell'ago basato sulla precisione
+                    if (Math.abs(cents) < 2) {
+                        this.meterNeedle.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+                        this.meterNeedle.style.boxShadow = '0 0 15px rgba(79, 172, 254, 0.8)';
+                    } else if (Math.abs(cents) < 10) {
+                        this.meterNeedle.style.background = 'linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%)';
+                        this.meterNeedle.style.boxShadow = '0 0 15px rgba(253, 187, 45, 0.8)';
+                    } else {
+                        this.meterNeedle.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)';
+                        this.meterNeedle.style.boxShadow = '0 0 15px rgba(255, 154, 158, 0.8)';
+                    }
+                }
+                
+                // Aggiorna cronologia per smoothing
+                this.detectionHistory.push({
+                    frequency: frequency,
+                    timestamp: Date.now()
+                });
+                
+                // Mantieni solo gli ultimi 10 rilevamenti
+                if (this.detectionHistory.length > 10) {
+                    this.detectionHistory.shift();
+                }
+            }
+
+            findClosestString(frequency) {
+                const currentStrings = this.tunings[this.currentTuning].strings;
+                let closest = null;
+                let minDifference = Infinity;
+                let closestIndex = -1;
+
+                currentStrings.forEach((string, index) => {
+                    const difference = Math.abs(frequency - string.frequency);
+                    if (difference < minDifference) {
+                        minDifference = difference;
+                        closest = string;
+                        closestIndex = index;
+                    }
+                });
+
+                // Considera valida solo se la differenza è ragionevole
+                if (closest && minDifference < closest.frequency * 0.15) {
+                    closest.index = closestIndex;
+                    return closest;
+                }
+
+                return null;
+            }
+
+            updateGuitarVisual(targetString, absCents, cents) {
+                // Reset previous active string
+                if (this.currentActiveString >= 0 && this.currentActiveString !== targetString.index) {
+                    this.guitarStrings[this.currentActiveString].classList.remove('active', 'sharp', 'flat', 'in-tune');
+                    this.tuningPegs[this.currentActiveString].classList.remove('active', 'sharp', 'flat');
+                }
+
+                this.currentActiveString = targetString.index;
+                const stringElement = this.guitarStrings[targetString.index];
+                const pegElement = this.tuningPegs[targetString.index];
+
+                // Remove all classes first
+                stringElement.classList.remove('active', 'sharp', 'flat', 'in-tune');
+                pegElement.classList.remove('active', 'sharp', 'flat');
+
+                // Add active class
+                stringElement.classList.add('active');
+                pegElement.classList.add('active');
+
+                // Add status classes based on tuning
+                if (absCents < 2) {
+                    stringElement.classList.add('in-tune');
+                } else if (cents > 0) {
+                    stringElement.classList.add('sharp');
+                    pegElement.classList.add('sharp');
+                } else {
+                    stringElement.classList.add('flat');
+                    pegElement.classList.add('flat');
+                }
+
+                this.lastDetectedFrequency = targetString.frequency;
+            }
+
+            drawSpectrum() {
+                const canvas = this.spectrumCanvas;
+                const ctx = this.spectrumCtx;
+                const rect = canvas.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+
+                // Clear canvas with gradient background
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, 'rgba(255,255,255,0.02)');
+                gradient.addColorStop(1, 'rgba(255,255,255,0.08)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+
+                if (!this.frequencyArray) return;
+
+                const barWidth = width / this.frequencyArray.length * 2;
+                const nyquist = this.audioContext.sampleRate / 2;
+                const maxFreq = 1000; // Mostra solo fino a 1kHz
+                const maxBin = Math.floor((maxFreq / nyquist) * this.frequencyArray.length);
+
+                // Disegna lo spettro con gradiente
+                const spectrumGradient = ctx.createLinearGradient(0, height, 0, 0);
+                spectrumGradient.addColorStop(0, 'rgba(79, 172, 254, 0.8)');
+                spectrumGradient.addColorStop(0.5, 'rgba(102, 126, 234, 0.6)');
+                spectrumGradient.addColorStop(1, 'rgba(118, 75, 162, 0.4)');
+                ctx.fillStyle = spectrumGradient;
+                
+                for (let i = 0; i < Math.min(maxBin, this.frequencyArray.length); i++) {
+                    const barHeight = (this.frequencyArray[i] / 255) * height * 0.8;
+                    const x = (i / maxBin) * width;
+                    const y = height - barHeight;
+                    
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                }
+
+                // Disegna linee di riferimento per le frequenze delle corde
+                ctx.strokeStyle = 'rgba(79, 172, 254, 0.6)';
+                ctx.lineWidth = 1;
+                
+                const currentStrings = this.tunings[this.currentTuning].strings;
+                currentStrings.forEach((string, index) => {
+                    if (string.frequency <= maxFreq) {
+                        const x = (string.frequency / maxFreq) * width;
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, height);
+                        ctx.stroke();
+                        
+                        // Etichetta
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.font = '10px Inter';
+                        ctx.fillText(string.name, x + 2, 15);
+                    }
+                });
+            }
+
+            drawWaveform() {
+                const canvas = this.waveformCanvas;
+                const ctx = this.waveformCtx;
+                const rect = canvas.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+
+                // Clear canvas with gradient background
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, 'rgba(255,255,255,0.02)');
+                gradient.addColorStop(1, 'rgba(255,255,255,0.08)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+
+                if (!this.timeDataArray) return;
+
+                // Disegna la forma d'onda con gradiente
+                const waveGradient = ctx.createLinearGradient(0, 0, width, 0);
+                waveGradient.addColorStop(0, 'rgba(79, 172, 254, 0.8)');
+                waveGradient.addColorStop(0.5, 'rgba(102, 126, 234, 0.9)');
+                waveGradient.addColorStop(1, 'rgba(79, 172, 254, 0.8)');
+                ctx.strokeStyle = waveGradient;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                const sliceWidth = width / this.timeDataArray.length;
+                let x = 0;
+
+                for (let i = 0; i < this.timeDataArray.length; i++) {
+                    const v = this.timeDataArray[i];
+                    const y = ((v + 1) / 2) * height;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+
+                    x += sliceWidth;
+                }
+
+                ctx.stroke();
+
+                // Linea centrale
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, height / 2);
+                ctx.lineTo(width, height / 2);
+                ctx.stroke();
+            }
+
+            clearCanvas() {
+                const spectrumRect = this.spectrumCanvas.getBoundingClientRect();
+                this.spectrumCtx.fillStyle = 'rgba(255,255,255,0.05)';
+                this.spectrumCtx.fillRect(0, 0, spectrumRect.width, spectrumRect.height);
+
+                const waveformRect = this.waveformCanvas.getBoundingClientRect();
+                this.waveformCtx.fillStyle = 'rgba(255,255,255,0.05)';
+                this.waveformCtx.fillRect(0, 0, waveformRect.width, waveformRect.height);
+            }
+
+            async playReferenceNote(frequency) {
+                if (!this.audioContext || this.audioContext.state === 'closed') {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, this.audioContext.currentTime + 0.05);
+                gainNode.gain.linearRampToValueAtTime(0.05, this.audioContext.currentTime + 0.8);
+                gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 1);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 1);
+            }
+
+            toggleReferenceNote(frequency, button, stringIndex) {
+                const isPlaying = this.referenceOscillators.has(frequency);
+                
+                if (isPlaying) {
+                    // Ferma il tono
+                    const oscillator = this.referenceOscillators.get(frequency);
+                    const gainNode = this.referenceGainNodes.get(frequency);
+                    
+                    gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.1);
+                    oscillator.stop(this.audioContext.currentTime + 0.1);
+                    
+                    this.referenceOscillators.delete(frequency);
+                    this.referenceGainNodes.delete(frequency);
+                    button.classList.remove('playing');
+                } else {
+                    // Avvia il tono
+                    if (!this.audioContext || this.audioContext.state === 'closed') {
+                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.type = 'sine';
+
+                    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.05, this.audioContext.currentTime + 0.1);
+
+                    oscillator.start();
+                    
+                    this.referenceOscillators.set(frequency, oscillator);
+                    this.referenceGainNodes.set(frequency, gainNode);
+                    button.classList.add('playing');
+
+                    // Evidenzia la corda corrispondente
+                    this.highlightString(stringIndex, 3000);
+
+                    // Auto-stop dopo 10 secondi
+                    setTimeout(() => {
+                        if (this.referenceOscillators.has(frequency)) {
+                            this.toggleReferenceNote(frequency, button, stringIndex);
+                        }
+                    }, 10000);
+                }
+            }
+
+            calibrateA440() {
+                if (!this.isListening) {
+                    this.showError('Avvia il rilevamento prima di calibrare');
+                    return;
+                }
+
+                // Avvia calibrazione automatica per A440
+                this.targetNote.textContent = 'Suona la corda La (A) per calibrare...';
+                this.centDeviation.textContent = 'Calibrazione...';
+                
+                // Implementa logica di calibrazione basata sui rilevamenti
+                setTimeout(() => {
+                    if (this.detectionHistory.length > 5) {
+                        const recentFreqs = this.detectionHistory.slice(-5).map(d => d.frequency);
+                        const avgFreq = recentFreqs.reduce((a, b) => a + b, 0) / recentFreqs.length;
+                        
+                        if (avgFreq > 100 && avgFreq < 130) { // Range della corda La
+                            const newA4 = (avgFreq / 110) * 440;
+                            this.a4Slider.value = newA4.toFixed(1);
+                            this.a4Frequency = newA4;
+                            document.getElementById('a4Value').textContent = newA4.toFixed(1);
+                            this.updateTuningFrequencies();
+                            this.showSuccess('Calibrazione completata!');
+                        } else {
+                            this.showError('Frequenza non valida per calibrazione A440');
+                        }
+                    } else {
+                        this.showError('Dati insufficienti per la calibrazione');
+                    }
+                }, 3000);
+            }
+
+            updatePerformanceInfo() {
+                this.frameCount++;
+                const now = Date.now();
+                
+                if (now - this.lastFPSUpdate >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFPSUpdate));
+                    this.performanceInfo.textContent = `FPS: ${this.fps}`;
+                    this.frameCount = 0;
+                    this.lastFPSUpdate = now;
+                }
+            }
+
+            showError(message) {
+                this.targetNote.textContent = `❌ ${message}`;
+                this.targetNote.style.color = 'rgba(255, 154, 158, 1)';
+                setTimeout(() => {
+                    this.targetNote.style.color = 'var(--text-primary)';
+                    if (!this.isListening) {
+                        this.targetNote.textContent = 'Pronto';
+                    }
+                }, 3000);
+            }
+
+            showSuccess(message) {
+                this.targetNote.textContent = `✅ ${message}`;
+                this.targetNote.style.color = 'rgba(79, 172, 254, 1)';
+                setTimeout(() => {
+                    this.targetNote.style.color = 'var(--text-primary)';
+                }, 3000);
+            }
+        }
+
+        // Inizializza l'accordatore
+        document.addEventListener('DOMContentLoaded', () => {
+            window.visualGuitarTuner = new VisualGuitarTuner();
+        });
+
+        // Gestisci chiusura pagina
+        window.addEventListener('beforeunload', () => {
+            if (window.visualGuitarTuner && window.visualGuitarTuner.isListening) {
+                window.visualGuitarTuner.stopTuning();
+            }
+        });
+
+        // Gestisci cambio di visibilità per ottimizzare performance
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && window.visualGuitarTuner && window.visualGuitarTuner.isListening) {
+                // Riduci la frequenza di aggiornamento quando la pagina non è visibile
+                console.log('Riduzione performance per tab nascosta');
+            }
+        });
+    </script>
+</body>
+</html>
